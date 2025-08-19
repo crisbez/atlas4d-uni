@@ -169,7 +169,7 @@ impl Store {
         let center_cell = Self::cell_of(center);
         let k = ((r_m / 170.0).ceil() as u32).min(8);
         let mut cells = HashSet::new();
-        for ring_cell in center_cell.k_ring(k) { cells.insert(ring_cell); }
+        for ring_cell in center_cell.grid_disk(k) { cells.insert(ring_cell); }
 
         let mut bins = Vec::new();
         let mut b = time_bin_5min(&t0);
