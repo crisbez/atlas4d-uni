@@ -1,0 +1,44 @@
+
+syntax = "proto3";
+package atlas4d;
+
+message Position { double lat = 1; double lon = 2; double alt_m = 3; }
+
+message Observation {
+  uint64 obs_id = 1;
+  string entity_id = 2;
+  string t = 3; // RFC3339
+  Position pos = 4;
+  float quality = 5;
+  double sigma_m = 6;
+  string source_json = 7; // optional JSON metadata
+}
+
+message IngestManyRequest { repeated Observation observations = 1; }
+message IngestManyResponse { uint64 ingested = 1; }
+
+message QueryNearRequest {
+  double lat = 1;
+  double lon = 2;
+  double radius_m = 3;
+  string t0 = 4; // RFC3339
+  string t1 = 5; // RFC3339
+  uint32 limit = 6;
+}
+message QueryNearResponse { repeated Observation observations = 1; }
+
+message ListSegmentsRequest {}
+message SegmentInfo {
+  string filename = 1;
+  uint64 size_bytes = 2;
+  string cell = 3; // H3 cell id as decimal
+  int64 time_bin = 4; // 5min bucket unix seconds
+  bool binary = 5;
+}
+message ListSegmentsResponse { repeated SegmentInfo segments = 1; }
+
+service Atlas4D {
+  rpc IngestMany (IngestManyRequest) returns (IngestManyResponse);
+  rpc QueryNear (QueryNearRequest) returns (stream Observation);
+  rpc ListSegments (ListSegmentsRequest) returns (ListSegmentsResponse);
+}

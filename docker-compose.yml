@@ -1,0 +1,9 @@
+
+version: "3.8"
+services:
+  atlas4d:
+    build: .
+    container_name: atlas4d
+    ports: ["50051:50051"]
+    volumes: ["./atlas4d-data:/data"]
+    restart: unless-stopped
