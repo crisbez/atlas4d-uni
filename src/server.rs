@@ -18,7 +18,8 @@ impl Atlas4D for Atlas4DService {
         let mut obs = Vec::new();
         for o in req.observations {
             let t = o.t.parse().map_err(|e: chrono::ParseError| Status::invalid_argument(format!("bad time: {}", e)))?;
-            let pos = PosModel { lat: o.pos.lat, lon: o.pos.lon, alt_m: o.pos.alt_m };
+            let p = o.pos.as_ref().ok_or(Status::invalid_argument("missing pos"))?;
+            let pos = PosModel { lat: p.lat, lon: p.lon, alt_m: p.alt_m };
             let entity_id = uuid::Uuid::parse_str(&o.entity_id).map_err(|e| Status::invalid_argument(format!("bad uuid: {}", e)))?;
             let source = if o.source_json.is_empty() { None } else { serde_json::from_str(&o.source_json).ok() };
             let sigma = if o.sigma_m == 0.0 { None } else { Some(o.sigma_m) };
