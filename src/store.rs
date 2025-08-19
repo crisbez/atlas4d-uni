@@ -110,7 +110,8 @@ impl Store {
         for entry in fs::read_dir(seg_dir)? {
             let entry = entry?;
             let path = entry.path();
-            if path.extension().and_then(|e| e.to_str()) not in [Some("seg"), Some("jsonl")] { continue; }
+            let ext = path.extension().and_then(|e| e.to_str());
+            if ext != Some("seg") if path.extension().and_then(|e| e.to_str()) not in [Some("seg"), Some("jsonl")] { continue; }if path.extension().and_then(|e| e.to_str()) not in [Some("seg"), Some("jsonl")] { continue; } ext != Some("jsonl") { continue; }
             let obs = Self::read_segment(&path)?;
             if obs.is_empty() { continue; }
             let mut map: HashMap<u64, usize> = HashMap::new();
@@ -145,9 +146,9 @@ impl Store {
             let fname = path.file_name().unwrap().to_string_lossy().to_string();
             let size = fs::metadata(&path)?.len();
             let binary = match path.extension().and_then(|e| e.to_str()) {
-                Some("seg") => True,
-                Some("jsonl") => False,
-                _ => False,
+                Some("seg") => true,
+                Some("jsonl") => false,
+                _ => false,
             };
             let stem = path.file_stem().unwrap().to_string_lossy();
             let parts: Vec<&str> = stem.split('_').collect();
@@ -179,9 +180,9 @@ impl Store {
         for cell in cells {
             for bin in &bins {
                 let path = self.seg_path(cell, *bin);
-                let mut tried = False;
+                let mut tried = false;
                 if path.exists() {
-                    tried = True;
+                    tried = true;
                     let obs = Self::read_segment(&path)?;
                     for o in obs {
                         if o.t < t0 || o.t > t1 { continue; }
